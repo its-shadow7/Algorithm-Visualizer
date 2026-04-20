@@ -17,7 +17,7 @@ export default function Visualizer() {
   const {
     instances,
     initInstance,
-    resetInstance,
+    purgeInstance,
     sharedDataset
   } = useAlgorithmStore();
 
@@ -29,12 +29,16 @@ export default function Visualizer() {
   // Initialize Algorithm
   useEffect(() => {
     async function init() {
+      // 1. Purge old state to free memory before calculating new arrays
+      purgeInstance('main');
+
       const data = await loadAlgorithmData(slug);
       const gen = data.algorithmFn(sharedDataset);
       const snaps = [];
       let result = gen.next();
       while (!result.done) {
-        snaps.push(result.value);
+        // 2. Freeze the snapshot object to reduce JS engine overhead
+        snaps.push(Object.freeze(result.value));
         result = gen.next();
       }
 
@@ -43,11 +47,11 @@ export default function Visualizer() {
 
     if (slug) init();
 
-    // 'Ghost Execution' Cleanup: KILL generators when user leaves the page
+    // 3. 'Ghost Execution' Cleanup: Completely purge instance memory on unmount
     return () => {
-      resetInstance('main');
+      purgeInstance('main');
     };
-  }, [slug, initInstance, resetInstance, sharedDataset]);
+  }, [slug, initInstance, purgeInstance, sharedDataset]);
 
   // Code Synchronization (Highlighting & Auto-Scroll)
   useEffect(() => {

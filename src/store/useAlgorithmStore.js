@@ -22,13 +22,17 @@ export const useAlgorithmStore = create((set, get) => ({
   
   setConfigSize: (size) => set({ configSize: size }),
 
-  setSharedDataset: (data) => set({ 
-    sharedDataset: data,
-    // Reset all instances when data changes
-    instances: Object.keys(get().instances).reduce((acc, id) => {
-      acc[id] = { ...get().instances[id], currentIndex: 0, isPlaying: false, isFinished: false };
+  setSharedDataset: (data) => set((state) => { 
+    // Purge all instances when data changes
+    const nextInstances = Object.keys(state.instances).reduce((acc, id) => {
+      acc[id] = { activeAlgorithm: null, snapshots: [], currentIndex: 0, isPlaying: false, isFinished: false };
       return acc;
-    }, {})
+    }, {});
+    
+    return {
+      sharedDataset: data,
+      instances: nextInstances
+    };
   }),
 
   initInstance: (id, algorithmData) => {
@@ -103,6 +107,22 @@ export const useAlgorithmStore = create((set, get) => ({
         [id]: { ...instance, currentIndex: 0, isPlaying: false, isFinished: false }
       }
     }));
+  },
+
+  purgeInstance: (id) => {
+    set((state) => {
+      const nextInstances = { ...state.instances };
+      if (nextInstances[id]) {
+        nextInstances[id] = {
+          activeAlgorithm: null,
+          snapshots: [],
+          currentIndex: 0,
+          isPlaying: false,
+          isFinished: false,
+        };
+      }
+      return { instances: nextInstances };
+    });
   },
 
   startAll: () => {

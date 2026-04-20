@@ -16,7 +16,8 @@ export default function useAlgorithmExecution(instanceId) {
   useEffect(() => {
     let timeout;
     
-    if (instance?.isPlaying && !instance?.isFinished) {
+    // 1. Strict Execution Bounds: prevent loops if data has been purged
+    if (instance?.isPlaying && !instance?.isFinished && instance?.snapshots?.length > 0) {
       const { interval, batch } = SPEED_TIERS[playbackSpeed] || SPEED_TIERS["1x"];
       
       const step = () => {
@@ -27,12 +28,28 @@ export default function useAlgorithmExecution(instanceId) {
             const nextSnap = instance.snapshots[nextIdx] || instance.snapshots[instance.snapshots.length - 1];
             
             if (nextSnap) {
-              const activeIdx = nextSnap.pointers?.active?.[0];
-              if (activeIdx !== undefined) {
+              // 1. Aggressive Pointer Harvesting (Greedy Lookup)
+              const p = nextSnap.pointers || {};
+              const activeIdx = 
+                p.active?.[0] ?? 
+                p.writing?.[0] ?? 
+                p.scanner?.[0] ?? 
+                p.pivot?.[0] ?? 
+                p.left?.[0] ?? 
+                p.right?.[0] ?? 
+                Object.values(p).flat().find(n => typeof n === 'number');
+
+              if (activeIdx !== undefined && nextSnap.dataState[activeIdx] !== undefined) {
+                // Diagnostic Heartbeat
+                console.log("🛠️ Driver Pointer:", activeIdx);
+
                 const item = nextSnap.dataState[activeIdx];
-                const val = typeof item === 'object' ? item.value : item;
-                const maxVal = Math.max(...nextSnap.dataState.map(d => typeof d === 'object' ? d.value : d));
-                audioEngine.playNote(val, maxVal);
+                const val = item?.value ?? item;
+                const maxVal = Math.max(...nextSnap.dataState.map(d => typeof d === 'object' ? d.value : d)) || 100;
+                
+                if (typeof val === 'number') {
+                  audioEngine.playNote(val, maxVal);
+                }
               }
             }
           } catch (e) {
@@ -47,8 +64,9 @@ export default function useAlgorithmExecution(instanceId) {
       timeout = setTimeout(step, interval);
     }
 
+    // 2. Strict Loop Termination: Sever timeouts on unmount or state overwrite
     return () => {
       if (timeout) clearTimeout(timeout);
     };
-  }, [instance?.isPlaying, instanceId, nextStep, playbackSpeed, instance?.isFinished, isSoundEnabled]);
+  }, [instance?.isPlaying, instanceId, nextStep, playbackSpeed, instance?.isFinished, instance?.snapshots?.length, isSoundEnabled]);
 }

@@ -98,7 +98,7 @@ function* merge(arr, left, mid, right, metrics) {
         description: "WRITING VALUE FROM LEFT",
         activeCodeLine: 17,
         dataState: getVisualState(i, j, k + 1),
-        pointers: { range: [left, right], writing: [k] },
+        pointers: { range: [left, right], active: [k], writing: [k] },
         metrics: { ...metrics }
       };
     } else {
@@ -108,7 +108,7 @@ function* merge(arr, left, mid, right, metrics) {
         description: "WRITING VALUE FROM RIGHT",
         activeCodeLine: 19,
         dataState: getVisualState(i, j, k + 1),
-        pointers: { range: [left, right], writing: [k] },
+        pointers: { range: [left, right], active: [k], writing: [k] },
         metrics: { ...metrics }
       };
     }
@@ -122,7 +122,7 @@ function* merge(arr, left, mid, right, metrics) {
       description: "FLUSHING REMAINING LEFT HALF",
       activeCodeLine: 23,
       dataState: getVisualState(i, j, k + 1),
-      pointers: { range: [left, right], writing: [k] },
+      pointers: { range: [left, right], active: [k], writing: [k] },
       metrics: { ...metrics }
     };
     k++;
@@ -135,7 +135,7 @@ function* merge(arr, left, mid, right, metrics) {
       description: "FLUSHING REMAINING RIGHT HALF",
       activeCodeLine: 24,
       dataState: getVisualState(i, j, k + 1),
-      pointers: { range: [left, right], writing: [k] },
+      pointers: { range: [left, right], active: [k], writing: [k] },
       metrics: { ...metrics }
     };
     k++;

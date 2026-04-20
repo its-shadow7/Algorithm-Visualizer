@@ -15,46 +15,60 @@ class AudioEngine {
   }
 
   playNote(value, maxVal) {
-    if (!this.ctx || this.ctx.state !== 'running') return;
+    // 1. Hard Unlock (Absolute first line to satisfy browser strictness)
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+
+    if (!this.ctx) return;
 
     try {
-      // 1. Polyphony Prevention (Monophonic Pattern)
-      // Immediately stop and disconnect previous note to prevent muddiness
+      // Polyphony Prevention
       if (this.activeOscillator) {
         try {
           this.activeOscillator.stop();
           this.activeOscillator.disconnect();
           this.activeGain.disconnect();
         } catch (e) {
-          // Silently fail if already stopped
+          // Already stopped
         }
       }
 
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
-      // 2. Logarithmic Frequency Mapping (Musical Scale)
-      // Range: 200Hz - 1000Hz
+      // 3. Frequency Safety & Mapping
+      // Fallback for maxVal to avoid division by zero or NaN
+      const safeMax = maxVal || 100;
+      const safeVal = value || 0;
+      
       const minFreq = 200;
       const maxFreq = 1000;
-      const freq = minFreq * Math.pow(maxFreq / minFreq, value / maxVal);
       
-      osc.type = 'triangle'; // Plucky/Chiptune characteristic
+      // Calculate Logarithmic Frequency
+      let freq = minFreq * Math.pow(maxFreq / minFreq, safeVal / safeMax);
+      
+      // 4. Frequency Health Check (Avoid 0Hz)
+      freq = Math.max(20, Math.min(3000, freq));
+      
+      // Heartbeat Log for Debugging
+      console.log("🔊 Playing Note:", Math.round(freq), "Hz (Value:", safeVal, "/", safeMax, ")");
+
+      osc.type = 'triangle';
       osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
 
-      // 3. 'Pluck' Envelope (Percussive sharp decay)
-      // Instant attack, very sharp 50ms exponential decay
-      const decayTime = 0.05; // 50ms
-      gain.gain.setValueAtTime(0.1, this.ctx.currentTime); 
+      // 5. Volume Bump & Envelope (0.3 starting gain)
+      const decayTime = 0.05; 
+      gain.gain.setValueAtTime(0.3, this.ctx.currentTime); 
       gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + decayTime);
 
+      // 6. Explicit Destination Connection
       osc.connect(gain);
       gain.connect(this.ctx.destination);
 
       osc.start();
       osc.stop(this.ctx.currentTime + decayTime);
 
-      // Track active nodes
       this.activeOscillator = osc;
       this.activeGain = gain;
 

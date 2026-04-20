@@ -34,7 +34,7 @@ export function* heapSort(array) {
       description: "EXTRACTING MAX ELEMENT TO END",
       activeCodeLine: 11,
       dataState: [...arr],
-      pointers: { writing: [0, i], sortedIndices: [...sortedIndices] },
+      pointers: { active: [0, i], writing: [0, i], sortedIndices: [...sortedIndices] },
       metrics: { ...metrics }
     };
 
@@ -121,7 +121,7 @@ function* heapify(arr, n, i, metrics, sortedIndices) {
       description: "HEAP PROPERTY VIOLATED: SWAPPING",
       activeCodeLine: 35,
       dataState: [...arr],
-      pointers: { writing: [i, largest], sortedIndices: [...sortedIndices] },
+      pointers: { active: [i, largest], writing: [i, largest], sortedIndices: [...sortedIndices] },
       metrics: { ...metrics }
     };
 

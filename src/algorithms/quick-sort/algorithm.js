@@ -95,7 +95,7 @@ function* partition(arr, low, high, metrics, sortedIndices) {
           description: `SWAPPING arr[${i}] AND arr[${j}]`,
           activeCodeLine: 16,
           dataState: [...arr],
-          pointers: { range: [low, high], writing: [i, j], pivot: high, sortedIndices: [...sortedIndices] },
+          pointers: { range: [low, high], active: [j], writing: [i, j], pivot: high, sortedIndices: [...sortedIndices] },
           metrics: { ...metrics }
         };
       }
@@ -109,7 +109,7 @@ function* partition(arr, low, high, metrics, sortedIndices) {
     description: "PLACING PIVOT IN FINAL POSITION",
     activeCodeLine: 20,
     dataState: [...arr],
-    pointers: { range: [low, high], writing: [i + 1, high], pivot: i + 1, sortedIndices: [...sortedIndices] },
+    pointers: { range: [low, high], active: [high], writing: [i + 1, high], pivot: i + 1, sortedIndices: [...sortedIndices] },
     metrics: { ...metrics }
   };
 
