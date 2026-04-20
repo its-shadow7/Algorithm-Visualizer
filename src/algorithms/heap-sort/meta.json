@@ -1,0 +1,5 @@
+{
+  "name": "Heap Sort",
+  "complexity": "O(N log N)",
+  "description": "An efficient comparison-based sorting algorithm that uses a binary heap data structure to organize elements before extracting them in sorted order."
+}

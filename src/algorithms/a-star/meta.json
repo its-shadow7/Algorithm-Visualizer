@@ -1,0 +1,7 @@
+{
+  "name": "a-star",
+  "title": "A* Search",
+  "complexity": "O(E)",
+  "space": "O(V)",
+  "description": "An informed search algorithm that uses heuristics to find the shortest path more efficiently than BFS/Dijkstra by estimating the remaining distance to the target."
+}

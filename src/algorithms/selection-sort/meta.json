@@ -1,0 +1,9 @@
+{
+  "name": "Selection Sort",
+  "slug": "selection-sort",
+  "complexity": "O(n²)",
+  "category": "SORTING",
+  "dataStructure": "ARRAY",
+  "description": "In-place comparison sort that divides the input into sorted and unsorted regions. It repeatedly finds the smallest element in the unsorted part and swaps it to the sorted part.",
+  "tags": ["SORTING", "COMPARISON", "IN-PLACE"]
+}

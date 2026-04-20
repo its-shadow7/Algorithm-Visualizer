@@ -1,0 +1,6 @@
+{
+  "name": "Breadth-First Search",
+  "slug": "bfs",
+  "complexity": "O(V + E)",
+  "description": "Explores all neighbor nodes at the present depth prior to moving on to the nodes at the next depth level. Guarantees the shortest path on unweighted grids."
+}

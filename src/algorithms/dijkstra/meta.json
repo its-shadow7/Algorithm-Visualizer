@@ -1,0 +1,7 @@
+{
+  "name": "dijkstra",
+  "title": "Dijkstra's Algorithm",
+  "complexity": "O(E log V)",
+  "space": "O(V)",
+  "description": "The classic weighted pathfinding algorithm. It finds the shortest path between nodes by always expanding the node with the lowest cumulative distance from the start."
+}

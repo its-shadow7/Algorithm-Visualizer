@@ -1,0 +1,9 @@
+{
+  "name": "Bubble Sort",
+  "slug": "bubble-sort",
+  "complexity": "O(n²)",
+  "category": "SORTING",
+  "dataStructure": "ARRAY",
+  "description": "A simple comparison-based sorting algorithm that repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order.",
+  "tags": ["SORTING", "COMPARISON", "BRUTE FORCE"]
+}

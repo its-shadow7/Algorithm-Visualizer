@@ -1,0 +1,5 @@
+{
+  "name": "Merge Sort",
+  "complexity": "O(N log N)",
+  "description": "A recursive divide-and-conquer algorithm that splits the array into halves, sorts them independently, and merges them back together in linear time."
+}

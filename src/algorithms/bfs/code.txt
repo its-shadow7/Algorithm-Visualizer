@@ -1,0 +1,25 @@
+function breadthFirstSearch(grid, start, target) {
+  const queue = [start];
+  const visited = new Set();
+  const previous = new Map();
+
+  visited.add(`${start.row}-${start.col}`);
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    if (current.row === target.row && current.col === target.col) {
+      return reconstructPath(previous, target);
+    }
+
+    const neighbors = getNeighbors(grid, current);
+    for (const neighbor of neighbors) {
+      const key = `${neighbor.row}-${neighbor.col}`;
+      if (!visited.has(key) && neighbor.type !== 'WALL') {
+        visited.add(key);
+        previous.set(key, current);
+        queue.push(neighbor);
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "name": "Quick Sort",
+  "complexity": "O(N log N)",
+  "description": "An efficient divide-and-conquer algorithm that partitions an array into sub-arrays around a pivot, then recursively sorts the sub-arrays."
+}

@@ -1,0 +1,31 @@
+function dijkstra(grid, start, target) {
+  const distances = new Map();
+  const previous = new Map();
+  const priorityQueue = [start];
+
+  distances.set(start, 0);
+
+  while (priorityQueue.length > 0) {
+    // 1. Extract node with lowest distance (Priority Queue Logic)
+    priorityQueue.sort((a, b) => distances.get(a) - distances.get(b));
+    const current = priorityQueue.shift();
+
+    if (current === target) return reconstructPath(previous, target);
+
+    for (const neighbor of getNeighbors(grid, current)) {
+      if (neighbor.isWall) continue;
+
+      // WEIGHT nodes have cost 5, EMPTY nodes have cost 1
+      const edgeWeight = neighbor.isWeight ? 5 : 1;
+      const tentativeDistance = distances.get(current) + edgeWeight;
+
+      if (tentativeDistance < (distances.get(neighbor) || Infinity)) {
+        distances.set(neighbor, tentativeDistance);
+        previous.set(neighbor, current);
+        if (!priorityQueue.includes(neighbor)) {
+          priorityQueue.push(neighbor);
+        }
+      }
+    }
+  }
+}
