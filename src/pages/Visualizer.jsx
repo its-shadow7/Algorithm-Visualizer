@@ -13,12 +13,12 @@ export default function Visualizer() {
   const { slug } = useParams();
   const editorRef = useRef(null);
   const decoRef = useRef([]);
-  
-  const { 
-    instances, 
-    initInstance, 
+
+  const {
+    instances,
+    initInstance,
     resetInstance,
-    sharedDataset 
+    sharedDataset
   } = useAlgorithmStore();
 
   const instance = instances.main;
@@ -37,12 +37,12 @@ export default function Visualizer() {
         snaps.push(result.value);
         result = gen.next();
       }
-      
+
       initInstance('main', { ...data, snapshots: snaps });
     }
-    
+
     if (slug) init();
-    
+
     // 'Ghost Execution' Cleanup: KILL generators when user leaves the page
     return () => {
       resetInstance('main');
@@ -55,10 +55,10 @@ export default function Visualizer() {
       const currentStep = instance.snapshots?.[instance.currentIndex];
       if (currentStep) {
         const line = currentStep.activeCodeLine;
-        
+
         // Reveal Line
         editorRef.current.revealLineInCenter(line);
-        
+
         // Update Decorations
         decoRef.current = editorRef.current.deltaDecorations(decoRef.current, [
           {
@@ -106,7 +106,7 @@ export default function Visualizer() {
           </div>
 
           <VisualizerCanvas snapshot={currentSnapshot} />
-          
+
           <PlaybackControls instanceId="main" />
         </div>
 
@@ -148,7 +148,7 @@ export default function Visualizer() {
                 Snapshot active
               </div>
             </div>
-            
+
             <div className="flex-1">
               <h4 className="text-lg font-bold text-white mb-2 uppercase tracking-tight">
                 {currentSnapshot?.description || "AWAITING_STEP_DATA"}

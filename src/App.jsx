@@ -9,14 +9,9 @@ import Pathfinding from './pages/Pathfinding';
 import TreeVisualizer from './pages/TreeVisualizer';
 
 export default function App() {
-  // Initialize theme choice strictly on mount
+  // Permanently initialize system in Dark Mode
   useEffect(() => {
-    const savedTheme = localStorage.getItem('algo_theme_preference');
-    if (savedTheme === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
+    document.documentElement.classList.add('dark');
   }, []);
 
   return (
@@ -27,9 +22,9 @@ export default function App() {
           <Route path="/" element={<Layout />}>
             {/* Default redirect to library */}
             <Route index element={<Navigate to="/library" replace />} />
-            
+
             <Route path="library" element={<Library />} />
-            
+
             {/* Hierarchical Sorting Routes */}
             <Route path="sorting">
               <Route index element={<Navigate to="/library" replace />} />
