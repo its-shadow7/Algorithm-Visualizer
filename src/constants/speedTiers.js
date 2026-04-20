@@ -7,4 +7,4 @@ export const SPEED_TIERS = {
   "MAX":  { interval: 20,   batch: 10, label: "MAX" },
 };
 
-export const DEFAULT_SPEED = "1x";
+export const DEFAULT_SPEED = "25x";

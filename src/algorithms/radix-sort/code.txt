@@ -1,0 +1,29 @@
+function radixSort(array) {
+  const max = Math.max(...array);
+  let exp = 1;
+
+  while (Math.floor(max / exp) > 0) {
+    const buckets = Array.from({ length: 10 }, () => []);
+
+    // Distribute elements into buckets (with float protection)
+    for (let num of array) {
+      const digit = Math.floor(Math.floor(num) / exp) % 10;
+      buckets[digit].push(num);
+    }
+
+    // Reconstruct the array using index-based swaps 
+    // to maintain unique object references in the DOM
+    let idx = 0;
+    for (let bucket of buckets) {
+      for (let num of bucket) {
+        const currentPos = array.indexOf(num);
+        if (currentPos !== idx) {
+          [array[idx], array[currentPos]] = [array[currentPos], array[idx]];
+        }
+        idx++;
+      }
+    }
+
+    exp *= 10;
+  }
+}

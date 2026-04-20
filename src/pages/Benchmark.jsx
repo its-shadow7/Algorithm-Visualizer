@@ -7,6 +7,7 @@ import SpeedController from '../components/SpeedController';
 import DataInjector from '../components/DataInjector';
 import { Play, RotateCcw, Zap } from 'lucide-react';
 import { SPEED_TIERS } from '../constants/speedTiers';
+import { libraryData } from '../config/libraryData';
 
 export default function Benchmark() {
   const [availableAlgos, setAvailableAlgos] = useState([]);
@@ -93,7 +94,9 @@ export default function Benchmark() {
             <Zap size={14} /> Race Mode Active
           </div>
           <DataInjector />
-          <SpeedController />
+          <div className="bg-white/5 border border-white/10 rounded-sm">
+            <SpeedController />
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
@@ -149,6 +152,9 @@ function RacePane({ instance, available, selected, onSelect, label, isWinner, be
   const currentSnapshot = instance?.snapshots?.[instance?.currentIndex ?? 0];
   const metrics = currentSnapshot?.metrics;
   
+  // Filter libraryData for Sorting category
+  const sortingAlgos = libraryData.filter(algo => algo.category === 'Sorting');
+  
   return (
     <div className="flex-1 flex overflow-hidden lg:flex-row flex-col">
       {/* Visualizer Side */}
@@ -165,7 +171,7 @@ function RacePane({ instance, available, selected, onSelect, label, isWinner, be
             className="bg-[#121212] border border-white/10 rounded-sm px-2 py-1 text-[10px] font-mono text-accent-green focus:outline-none"
           >
             <option value="">SELECT_ALGORITHM</option>
-            {available.map(a => <option key={a.slug} value={a.slug}>{a.name.toUpperCase()}</option>)}
+            {sortingAlgos.map(a => <option key={a.id} value={a.id}>{a.title.toUpperCase()}</option>)}
           </select>
           {isWinner && (
             <div className="bg-accent-green text-black text-[9px] font-mono font-bold px-2 py-0.5 rounded-sm animate-bounce">🏆 SPEED WINNER</div>

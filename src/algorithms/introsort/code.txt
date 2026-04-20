@@ -1,0 +1,22 @@
+function introSort(array) {
+  const n = array.length;
+  const depthLimit = 2 * Math.floor(Math.log2(n));
+  introsortLoop(array, 0, n - 1, depthLimit);
+}
+
+function introsortLoop(arr, low, high, depth) {
+  const size = high - low + 1;
+  
+  if (size < 16) {
+    insertionSort(arr, low, high);
+  } else if (depth === 0) {
+    heapsort(arr, low, high);
+  } else {
+    const pivot = partition(arr, low, high);
+    introsortLoop(arr, low, pivot, depth - 1);
+    introsortLoop(arr, pivot + 1, high, depth - 1);
+  }
+}
+
+// Sub-algorithms: insertionSort, heapsort, partition
+// (All implemented using in-place swaps)

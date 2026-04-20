@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { Database, Zap } from 'lucide-react';
 import { useAlgorithmStore } from '../store/useAlgorithmStore';
+import { audioEngine } from '../utils/audioEngine';
 
 export default function DataInjector() {
   const { setSharedDataset, configSize, setConfigSize } = useAlgorithmStore();
@@ -14,6 +15,7 @@ export default function DataInjector() {
   };
 
   const generateData = useCallback((type) => {
+    audioEngine.init();
     let newData = [];
     const size = configSize;
     
@@ -62,15 +64,18 @@ export default function DataInjector() {
 
   return (
     <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-3 py-1.5 rounded-sm">
-      <div className="flex items-center gap-2 border-r border-white/10 pr-3 mr-1">
-        <label className="text-[8px] font-mono text-text-muted uppercase">Size N=</label>
+      <div className="flex items-center gap-3 border-r border-white/10 pr-4 mr-1">
+        <label className="text-[10px] font-mono text-text-muted uppercase font-bold whitespace-nowrap min-w-[64px]">
+          Size: <span className="text-accent-green">{configSize}</span>
+        </label>
         <input 
-          type="number" 
+          type="range" 
           value={configSize}
           onChange={handleSizeChange}
           min="10" 
           max="100"
-          className="bg-transparent border-none text-[10px] font-mono text-accent-green w-8 p-0 focus:outline-none"
+          step="1"
+          className="w-32 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-accent-green hover:accent-accent-green-hover transition-all"
         />
       </div>
       

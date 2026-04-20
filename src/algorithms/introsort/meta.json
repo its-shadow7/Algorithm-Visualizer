@@ -1,0 +1,5 @@
+{
+  "name": "Introsort [C++ Internal]",
+  "complexity": "O(n log n)",
+  "description": "The standard sorting algorithm used by C++ std::sort. It begins with Quicksort for speed, but introspectively switches to Heapsort if the recursion depth exceeds a mathematical limit, guaranteeing O(n log n) worst-case performance. It also switches to Insertion Sort for small partitions."
+}

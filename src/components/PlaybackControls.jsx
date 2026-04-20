@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Play, Pause, SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 import { useAlgorithmStore } from '../store/useAlgorithmStore';
+import { audioEngine } from '../utils/audioEngine';
 
 export default function PlaybackControls({ instanceId = 'main' }) {
   const { 
@@ -35,7 +36,10 @@ export default function PlaybackControls({ instanceId = 'main' }) {
       </div>
 
       <button 
-        onClick={() => togglePlay(instanceId)}
+        onClick={() => {
+          audioEngine.init();
+          togglePlay(instanceId);
+        }}
         className="w-12 h-12 bg-accent-green hover:bg-accent-green-hover text-black rounded-full flex items-center justify-center transition-all shadow-[0_0_20px_rgba(74,222,128,0.3)]"
       >
         {instance.isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}

@@ -1,0 +1,5 @@
+{
+  "name": "Timsort [Python Internal]",
+  "complexity": "O(n log n)",
+  "description": "The standard sorting algorithm used internally by Python (list.sort) and Java for objects. It is a highly optimized, stable hybrid of Merge Sort and Insertion Sort designed to perform well on many kinds of real-world data."
+}

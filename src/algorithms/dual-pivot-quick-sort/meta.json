@@ -1,0 +1,5 @@
+{
+  "name": "Dual-Pivot Quicksort [Java Internal]",
+  "complexity": "O(n log n)",
+  "description": "The default sorting algorithm used by Java's Arrays.sort() for primitive data types. It uses two pivots to partition the array into three parts (< P1, P1-P2, > P2), offering superior performance to classic single-pivot Quicksort on many kinds of real-world data."
+}

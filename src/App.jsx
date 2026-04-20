@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout';
@@ -9,6 +9,16 @@ import Pathfinding from './pages/Pathfinding';
 import TreeVisualizer from './pages/TreeVisualizer';
 
 export default function App() {
+  // Initialize theme choice strictly on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('algo_theme_preference');
+    if (savedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <BrowserRouter>

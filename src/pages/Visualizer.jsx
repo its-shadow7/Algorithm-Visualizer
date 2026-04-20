@@ -88,13 +88,7 @@ export default function Visualizer() {
       {/* Sub-Header / ToolBar */}
       <div className="h-12 border-b border-[#262626] bg-[#0c0c0c] flex items-center justify-between px-6 shrink-0">
         <div className="flex items-center gap-4">
-          <div className="text-[10px] font-mono text-text-muted uppercase tracking-widest px-2 py-1 bg-white/5 border border-white/5 rounded-sm">
-            Dataset: <span className="text-accent-green">{sharedDataset.length} ITEMS</span>
-          </div>
           <DataInjector />
-        </div>
-        
-        <div className="flex items-center gap-4">
           <SpeedController />
         </div>
       </div>
@@ -112,6 +106,7 @@ export default function Visualizer() {
           </div>
 
           <VisualizerCanvas snapshot={currentSnapshot} />
+          
           <PlaybackControls instanceId="main" />
         </div>
 

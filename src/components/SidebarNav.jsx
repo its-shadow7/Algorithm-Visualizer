@@ -76,11 +76,24 @@ export default function SidebarNav() {
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden space-y-0.5 ml-2 border-l border-white/5"
               >
+                {/* Category: Classic */}
+                <div className="px-5 py-2 mt-2 text-[8px] font-mono font-bold text-text-muted uppercase tracking-widest border-b border-white/5 mb-1">Classic Algorithms</div>
                 <SubNavItem to="/sorting/merge-sort" label="Merge Sort" />
                 <SubNavItem to="/sorting/quick-sort" label="Quick Sort" />
                 <SubNavItem to="/sorting/heap-sort" label="Heap Sort" />
                 <SubNavItem to="/sorting/bubble-sort" label="Bubble Sort" />
                 <SubNavItem to="/sorting/selection-sort" label="Selection Sort" />
+                <SubNavItem to="/sorting/insertion-sort" label="Insertion Sort" />
+
+                {/* Category: System Engines */}
+                <div className="px-5 py-2 mt-4 text-[8px] font-mono font-bold text-text-muted uppercase tracking-widest border-b border-white/5 mb-1">System Engines</div>
+                <SubNavItem to="/sorting/timsort" label="Timsort [Python]" />
+                <SubNavItem to="/sorting/dual-pivot-quick-sort" label="Dual-Pivot QS [Java]" />
+                <SubNavItem to="/sorting/introsort" label="Introsort [C++]" />
+
+                {/* Category: Non-Comparative */}
+                <div className="px-5 py-2 mt-4 text-[8px] font-mono font-bold text-text-muted uppercase tracking-widest border-b border-white/5 mb-1">Non-Comparative</div>
+                <SubNavItem to="/sorting/radix-sort" label="Radix Sort" />
               </motion.div>
             )}
           </AnimatePresence>

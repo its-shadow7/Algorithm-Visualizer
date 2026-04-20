@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export const useAlgorithmStore = create((set, get) => ({
   // Global Settings
-  playbackSpeed: '1x', 
+  playbackSpeed: '25x', 
   configSize: 12, // Default array size
   sharedDataset: [65, 34, 12, 89, 45, 23, 76, 10].map((v, i) => ({ id: `init-${i}`, value: v })),
   

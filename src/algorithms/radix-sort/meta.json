@@ -1,0 +1,5 @@
+{
+  "name": "Radix Sort",
+  "complexity": "O(d * (n + k))",
+  "description": "A non-comparative sorting algorithm that avoids comparison by creating and distributing elements into buckets according to their radix (digits). Optimal for sorting integers."
+}

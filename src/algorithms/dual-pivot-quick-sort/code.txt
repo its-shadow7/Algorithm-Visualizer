@@ -1,0 +1,45 @@
+function dualPivotQuickSort(arr, low, high) {
+  if (low < high) {
+    // 1. Choose outer pivots and ensure p1 < p2
+    if (arr[low] > arr[high]) {
+      [arr[low], arr[high]] = [arr[high], arr[low]];
+    }
+
+    const p1 = arr[low];
+    const p2 = arr[high];
+
+    // 2. 3-way partitioning
+    let lt = low + 1;
+    let gt = high - 1;
+    let k = low + 1;
+
+    while (k <= gt) {
+      if (arr[k] < p1) {
+        [arr[k], arr[lt]] = [arr[lt], arr[k]];
+        lt++;
+      } else if (arr[k] >= p2) {
+        while (arr[gt] > p2 && k < gt) {
+          gt--;
+        }
+        [arr[k], arr[gt]] = [arr[gt], arr[k]];
+        gt--;
+        if (arr[k] < p1) {
+          [arr[k], arr[lt]] = [arr[lt], arr[k]];
+          lt++;
+        }
+      }
+      k++;
+    }
+
+    // 3. Swap pivots to final positions
+    const lp = lt - 1;
+    const rp = gt + 1;
+    [arr[low], arr[lp]] = [arr[lp], arr[low]];
+    [arr[high], arr[rp]] = [arr[rp], arr[high]];
+
+    // 4. Recursive calls
+    dualPivotQuickSort(arr, low, lp - 1);
+    dualPivotQuickSort(arr, lp + 1, rp - 1);
+    dualPivotQuickSort(arr, rp + 1, high);
+  }
+}
