@@ -1,0 +1,5 @@
+{
+  "name": "Insertion Sort",
+  "complexity": "O(n²)",
+  "description": "Insertion Sort builds the final sorted array one item at a time. It is much less efficient on large lists than more advanced algorithms such as Quicksort, Heapsort, or Merge Sort."
+}

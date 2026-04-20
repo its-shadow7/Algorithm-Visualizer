@@ -8,7 +8,7 @@ import { audioEngine } from '../utils/audioEngine';
  * Custom hook to drive the execution loop of a specific algorithm instance.
  * @param {string} instanceId - 'main', 'raceA', 'raceB', etc.
  */
-export default function useAlgorithmExecution(instanceId) {
+export default function useAlgorithmExecution(instanceId, initCallback = null) {
   const { instances, nextStep, playbackSpeed } = useAlgorithmStore();
   const { isSoundEnabled } = useUIStore();
   const instance = instances[instanceId];
@@ -16,8 +16,14 @@ export default function useAlgorithmExecution(instanceId) {
   useEffect(() => {
     let timeout;
     
-    // 1. Strict Execution Bounds: prevent loops if data has been purged
-    if (instance?.isPlaying && !instance?.isFinished && instance?.snapshots?.length > 0) {
+    // 1. Bulletproof Initialization: Spin up generator if playing from zero-state
+    if (instance?.isPlaying && instance?.snapshots?.length <= 1) {
+      if (initCallback) initCallback();
+      return; // React will re-trigger this hook once snapshots are populated
+    }
+
+    // 2. Strict Execution Bounds: prevent loops if data has been purged
+    if (instance?.isPlaying && !instance?.isFinished && instance?.snapshots?.length > 1) {
       const { interval, batch } = SPEED_TIERS[playbackSpeed] || SPEED_TIERS["1x"];
       
       const step = () => {
@@ -68,5 +74,5 @@ export default function useAlgorithmExecution(instanceId) {
     return () => {
       if (timeout) clearTimeout(timeout);
     };
-  }, [instance?.isPlaying, instanceId, nextStep, playbackSpeed, instance?.isFinished, instance?.snapshots?.length, isSoundEnabled]);
+  }, [instance?.isPlaying, instanceId, nextStep, playbackSpeed, instance?.isFinished, instance?.snapshots?.length, isSoundEnabled, initCallback, instance?.currentIndex]);
 }

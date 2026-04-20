@@ -2,10 +2,10 @@ import { create } from 'zustand';
 
 export const useAlgorithmStore = create((set, get) => ({
   // Global Settings
-  playbackSpeed: '25x', 
+  playbackSpeed: '25x',
   configSize: 12, // Default array size
   sharedDataset: [65, 34, 12, 89, 45, 23, 76, 10].map((v, i) => ({ id: `init-${i}`, value: v })),
-  
+
   // instances: { [id]: { activeAlgorithm, snapshots, currentIndex, isPlaying, isFinished } }
   instances: {
     main: {
@@ -19,16 +19,32 @@ export const useAlgorithmStore = create((set, get) => ({
 
   // Actions
   setGlobalSpeed: (speed) => set({ playbackSpeed: speed }),
-  
+
   setConfigSize: (size) => set({ configSize: size }),
 
-  setSharedDataset: (data) => set((state) => { 
+  setSharedDataset: (data) => set((state) => {
     // Purge all instances when data changes
     const nextInstances = Object.keys(state.instances).reduce((acc, id) => {
-      acc[id] = { activeAlgorithm: null, snapshots: [], currentIndex: 0, isPlaying: false, isFinished: false };
+      // 2. The Zero-State Snapshot
+      const initSnapshot = Object.freeze({
+        dataState: data,
+        pointers: { active: [], range: null, writing: [], sortedIndices: [] },
+        metrics: { comparisons: 0, swaps: 0 },
+        description: "ARRAY GENERATED",
+        activeCodeLine: 1
+      });
+
+      acc[id] = {
+        ...state.instances[id],
+        snapshots: [initSnapshot],
+        currentIndex: 0,
+        isPlaying: false,
+        isFinished: false,
+        metrics: { comparisons: 0, swaps: 0 }
+      };
       return acc;
     }, {});
-    
+
     return {
       sharedDataset: data,
       instances: nextInstances
@@ -36,25 +52,30 @@ export const useAlgorithmStore = create((set, get) => ({
   }),
 
   initInstance: (id, algorithmData) => {
-    set((state) => ({
-      instances: {
-        ...state.instances,
-        [id]: {
-          activeAlgorithm: algorithmData,
-          snapshots: algorithmData.snapshots || [],
-          currentIndex: 0,
-          isPlaying: false,
-          isFinished: false,
-          metrics: { comparisons: 0, swaps: 0 }
+    set((state) => {
+      const prev = state.instances[id] || {};
+      return {
+        instances: {
+          ...state.instances,
+          [id]: {
+            ...prev,
+            activeAlgorithm: algorithmData,
+            snapshots: algorithmData.snapshots || [],
+            currentIndex: 0,
+            // 🛡️ DO NOT touch isPlaying here. Let the execution driver or UI handle it.
+            isPlaying: prev.isPlaying ?? false,
+            isFinished: false,
+            metrics: { comparisons: 0, swaps: 0 }
+          }
         }
-      }
-    }));
+      };
+    });
   },
 
   nextStep: (id, batch = 1) => {
     const instance = get().instances[id];
     if (!instance || instance.isFinished) return;
-    
+
     if (instance.currentIndex < instance.snapshots.length - 1) {
       const nextIdx = Math.min(instance.currentIndex + batch, instance.snapshots.length - 1);
       const isFinished = nextIdx === instance.snapshots.length - 1;
@@ -62,8 +83,8 @@ export const useAlgorithmStore = create((set, get) => ({
       set((state) => ({
         instances: {
           ...state.instances,
-          [id]: { 
-            ...instance, 
+          [id]: {
+            ...instance,
             currentIndex: nextIdx,
             isFinished,
             isPlaying: isFinished ? false : instance.isPlaying
@@ -76,7 +97,7 @@ export const useAlgorithmStore = create((set, get) => ({
   prevStep: (id) => {
     const instance = get().instances[id];
     if (!instance || instance.currentIndex === 0) return;
-    
+
     set((state) => ({
       instances: {
         ...state.instances,
@@ -88,7 +109,7 @@ export const useAlgorithmStore = create((set, get) => ({
   togglePlay: (id) => {
     const instance = get().instances[id];
     if (!instance) return;
-    
+
     set((state) => ({
       instances: {
         ...state.instances,
@@ -100,7 +121,7 @@ export const useAlgorithmStore = create((set, get) => ({
   resetInstance: (id) => {
     const instance = get().instances[id];
     if (!instance) return;
-    
+
     set((state) => ({
       instances: {
         ...state.instances,
@@ -114,11 +135,12 @@ export const useAlgorithmStore = create((set, get) => ({
       const nextInstances = { ...state.instances };
       if (nextInstances[id]) {
         nextInstances[id] = {
-          activeAlgorithm: null,
+          ...nextInstances[id],
           snapshots: [],
           currentIndex: 0,
           isPlaying: false,
           isFinished: false,
+          metrics: { comparisons: 0, swaps: 0 }
         };
       }
       return { instances: nextInstances };

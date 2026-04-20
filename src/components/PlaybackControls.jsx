@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Play, Pause, SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 import { useAlgorithmStore } from '../store/useAlgorithmStore';
 import { audioEngine } from '../utils/audioEngine';
 
-export default function PlaybackControls({ instanceId = 'main' }) {
+export default function PlaybackControls({ instanceId = 'main', triggerInit }) {
   const { 
     instances, 
     nextStep, 
@@ -15,6 +15,32 @@ export default function PlaybackControls({ instanceId = 'main' }) {
   const instance = instances[instanceId];
 
   if (!instance) return null;
+
+  const handlePlayToggle = async () => {
+    audioEngine.init();
+    
+    // 🛡️ Safe-Guard: If playing from zero-state, ensure we are initialized first
+    if (!instance.isPlaying && instance.snapshots.length <= 1 && triggerInit) {
+      await triggerInit();
+    }
+    
+    togglePlay(instanceId);
+  };
+
+  const handleNextStep = async () => {
+    // 🛡️ Lag-Fix: If snapshots haven't been generated yet (Step 1 / 1), generate them first
+    if (instance.snapshots.length <= 1 && triggerInit) {
+      await triggerInit();
+      // Use setTimeout to push the nextStep to the next execution tick 
+      // after the store has finished its batch update
+      setTimeout(() => nextStep(instanceId), 0);
+      return;
+    }
+
+    if (instance.currentIndex < instance.snapshots.length - 1) {
+      nextStep(instanceId);
+    }
+  };
 
   return (
     <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-bg-card/80 backdrop-blur-md border border-white/5 px-6 py-3 rounded-full flex items-center gap-8 shadow-2xl z-20">
@@ -36,10 +62,7 @@ export default function PlaybackControls({ instanceId = 'main' }) {
       </div>
 
       <button 
-        onClick={() => {
-          audioEngine.init();
-          togglePlay(instanceId);
-        }}
+        onClick={handlePlayToggle}
         className="w-12 h-12 bg-accent-green hover:bg-accent-green-hover text-black rounded-full flex items-center justify-center transition-all shadow-[0_0_20px_rgba(74,222,128,0.3)]"
       >
         {instance.isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
@@ -47,8 +70,8 @@ export default function PlaybackControls({ instanceId = 'main' }) {
 
       <div className="flex items-center gap-4">
         <button 
-          onClick={() => nextStep(instanceId)}
-          disabled={instance.currentIndex === instance.snapshots.length - 1}
+          onClick={handleNextStep}
+          disabled={instance.currentIndex === instance.snapshots.length - 1 && instance.snapshots.length > 1}
           className="text-text-secondary hover:text-white disabled:opacity-20 transition-colors"
         >
           <SkipForward size={20} fill="currentColor" />

@@ -1,0 +1,17 @@
+async function insertionSort(array) {
+  const n = array.length;
+  for (let i = 1; i < n; i++) {
+    let key = array[i];
+    let j = i - 1;
+
+    // Shift elements of array[0..i-1] that are
+    // greater than key to one position ahead
+    while (j >= 0 && array[j].value > key.value) {
+      array[j + 1] = array[j];
+      j = j - 1;
+      yield { pointers: { active: [j], writing: [j + 1] } };
+    }
+    array[j + 1] = key;
+    yield { pointers: { writing: [j + 1] } };
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { useAlgorithmStore } from '../store/useAlgorithmStore';
@@ -13,6 +13,7 @@ export default function Visualizer() {
   const { slug } = useParams();
   const editorRef = useRef(null);
   const decoRef = useRef([]);
+  const [moduleError, setModuleError] = useState(false);
 
   const {
     instances,
@@ -22,36 +23,61 @@ export default function Visualizer() {
   } = useAlgorithmStore();
 
   const instance = instances.main;
+  const datasetLength = sharedDataset?.length;
 
-  // Drive execution for 'main' instance
-  useAlgorithmExecution('main');
-
-  // Initialize Algorithm
-  useEffect(() => {
-    async function init() {
-      // 1. Purge old state to free memory before calculating new arrays
-      purgeInstance('main');
-
+  // Bulletproof Initialization generator
+  const triggerInit = React.useCallback(async () => {
+    try {
       const data = await loadAlgorithmData(slug);
       const gen = data.algorithmFn(sharedDataset);
       const snaps = [];
       let result = gen.next();
+      
       while (!result.done) {
-        // 2. Freeze the snapshot object to reduce JS engine overhead
         snaps.push(Object.freeze(result.value));
         result = gen.next();
       }
-
       initInstance('main', { ...data, snapshots: snaps });
+    } catch (err) {
+      console.error("Lazy initialization failed:", err);
+      setModuleError(true);
+    }
+  }, [slug, sharedDataset, initInstance]);
+
+  // Drive execution for 'main' instance
+  useAlgorithmExecution('main', triggerInit);
+
+  // Initialize Algorithm (Metadata Only - Lazy Evaluation)
+  useEffect(() => {
+    async function loadMeta() {
+      try {
+        setModuleError(false);
+        purgeInstance('main');
+        const data = await loadAlgorithmData(slug);
+        
+        // Seed the initial 'Zero-State' snapshot on mount
+        const initSnapshot = Object.freeze({
+          dataState: sharedDataset,
+          pointers: { active: [], range: null, writing: [], sortedIndices: [] },
+          metrics: { comparisons: 0, swaps: 0 },
+          description: "READY",
+          activeCodeLine: 1
+        });
+
+        initInstance('main', { ...data, snapshots: [initSnapshot] });
+      } catch (err) {
+        console.error("Algorithm metadata load failed:", err);
+        setModuleError(true);
+      }
     }
 
-    if (slug) init();
+    if (slug) loadMeta();
 
     // 3. 'Ghost Execution' Cleanup: Completely purge instance memory on unmount
     return () => {
       purgeInstance('main');
     };
-  }, [slug, initInstance, purgeInstance, sharedDataset]);
+  }, [slug, initInstance, purgeInstance, datasetLength]);
 
   // Code Synchronization (Highlighting & Auto-Scroll)
   useEffect(() => {
@@ -77,6 +103,26 @@ export default function Visualizer() {
       }
     }
   }, [instance?.currentIndex, instance?.snapshots]);
+
+  if (moduleError) return (
+    <div className="p-10 flex flex-col items-center justify-center h-full bg-[#0a0a0a]">
+      <div className="max-w-md w-full p-8 border border-red-500/30 bg-red-500/5 rounded-lg flex flex-col items-center text-center">
+        <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        </div>
+        <h2 className="text-white text-lg font-bold mb-2 uppercase tracking-widest">Initialization Failed</h2>
+        <p className="text-text-secondary text-sm mb-6 leading-relaxed">
+          The requested algorithm module "{slug}" could not be loaded. It may be missing or contains internal errors.
+        </p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-6 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-[10px] font-mono text-white tracking-widest uppercase transition-all rounded-sm"
+        >
+          Retry System Load
+        </button>
+      </div>
+    </div>
+  );
 
   if (!instance?.activeAlgorithm) return (
     <div className="p-10 flex flex-col items-center justify-center h-full">
@@ -111,7 +157,7 @@ export default function Visualizer() {
 
           <VisualizerCanvas snapshot={currentSnapshot} />
 
-          <PlaybackControls instanceId="main" />
+          <PlaybackControls instanceId="main" triggerInit={triggerInit} />
         </div>
 
         {/* RIGHT: Code & Walkthrough (40%) */}

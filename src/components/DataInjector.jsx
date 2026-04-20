@@ -4,7 +4,7 @@ import { useAlgorithmStore } from '../store/useAlgorithmStore';
 import { audioEngine } from '../utils/audioEngine';
 
 export default function DataInjector() {
-  const { setSharedDataset, configSize, setConfigSize } = useAlgorithmStore();
+  const { setSharedDataset, configSize, setConfigSize, resetInstance } = useAlgorithmStore();
 
   const handleSizeChange = (e) => {
     let val = parseInt(e.target.value);
@@ -50,8 +50,10 @@ export default function DataInjector() {
       value: val
     }));
     
+    // Explicitly Auto-Pause (reset global playback)
+    resetInstance('main');
     setSharedDataset(dataset);
-  }, [configSize, setSharedDataset]);
+  }, [configSize, setSharedDataset, resetInstance]);
 
   // Reactive Data Generation on Size Change
   useEffect(() => {

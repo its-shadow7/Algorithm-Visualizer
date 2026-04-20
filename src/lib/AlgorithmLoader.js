@@ -29,7 +29,7 @@ export const loadAlgorithmData = async (slug) => {
   return {
     meta: meta.default || meta,
     slug,
-    algorithmFn: algorithmModule[Object.keys(algorithmModule)[0]], 
+    algorithmFn: algorithmModule[Object.keys(algorithmModule)[0]],
     code
   };
 };

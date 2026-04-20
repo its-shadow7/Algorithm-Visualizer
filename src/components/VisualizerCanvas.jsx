@@ -4,11 +4,15 @@ import { useAlgorithmStore } from '../store/useAlgorithmStore';
 import { SPEED_TIERS } from '../constants/speedTiers';
 
 export default function VisualizerCanvas({ snapshot }) {
-  const { playbackSpeed } = useAlgorithmStore();
+  const { playbackSpeed, sharedDataset } = useAlgorithmStore();
   
-  if (!snapshot) return <div className="p-10 text-text-muted">Initializing Canvas...</div>;
+  // 3. Canvas Safe-Guard: Fallback to base dataset to prevent UI blanking
+  const currentSnapshot = snapshot || {
+    dataState: sharedDataset,
+    pointers: { active: [], range: null, writing: [], sortedIndices: [] }
+  };
 
-  const { dataState, pointers } = snapshot;
+  const { dataState, pointers } = currentSnapshot;
   const maxValue = Math.max(...dataState.map((d) => (d?.value ? d.value : d))); // Fallback for transition phase
   
   const isHighSpeed = ['25x', '100x', 'MAX'].includes(playbackSpeed);
@@ -26,10 +30,10 @@ export default function VisualizerCanvas({ snapshot }) {
           const isWriting = pointers.writing?.includes(idx);
           const isSecondary = pointers.secondary?.includes?.(idx);
           const isPivot = pointers.pivot === idx || pointers.pivot?.includes?.(idx);
-          const isSwapping = (isActive || isPivot || isWriting || isSecondary) && (snapshot.description?.includes("SWAP") || snapshot.description?.includes("WRITE") || snapshot.description?.includes("PARTITION") || snapshot.description?.includes("HEAPIFY"));
+          const isSwapping = (isActive || isPivot || isWriting || isSecondary) && (currentSnapshot.description?.includes("SWAP") || currentSnapshot.description?.includes("WRITE") || currentSnapshot.description?.includes("PARTITION") || currentSnapshot.description?.includes("HEAPIFY"));
           
           const inRange = pointers.range ? (idx >= pointers.range[0] && idx <= pointers.range[1]) : true;
-          const isComplete = snapshot.description?.includes("COMPLETE");
+          const isComplete = currentSnapshot.description?.includes("COMPLETE");
           const isSortedIdx = pointers.sortedIndices?.includes(idx) || isComplete;
           
           let color = isSortedIdx ? "bg-zinc-500" : "bg-zinc-700";
